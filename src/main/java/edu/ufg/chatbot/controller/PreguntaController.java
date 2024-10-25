@@ -26,7 +26,7 @@ public class PreguntaController {
 	}
 	
 	// 1 - Devuelve la respuesta guardada en base
-	@GetMapping
+	@PostMapping("/respuesta")
 	public PromptDTO getRespuesta(@RequestBody PromptDTO prompt) {
 		return this.repository.findByPregunta(prompt.pregunta())
 				.map(this.mapper::map)
@@ -42,6 +42,19 @@ public class PreguntaController {
 	// 3 - Guardar pregunta y respuesta
 	@PostMapping
 	public PromptDTO postPreguntaYRespuesta(@RequestBody PromptDTO dto) {
+
+		// Verificar respuesta vacia
+		if (dto.respuesta() == null || dto.respuesta().isBlank()) {
+			return new PromptDTO(dto.pregunta(), "respuesta vacía");
+		}
+
+		// Verificar si la pregunta ya existe
+		if (this.repository.existsByPregunta(dto.pregunta())) {
+			// Si ya existe, devolver el DTO sin guardar
+			return dto;
+		}
+
+		// Si no existe, guardar la nueva pregunta y devolver el resultado
 		Pregunta entity = this.mapper.map(dto);
 		return this.mapper.map(this.repository.save(entity));
 	}

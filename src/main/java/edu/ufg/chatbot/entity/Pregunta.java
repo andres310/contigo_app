@@ -15,6 +15,9 @@ public class Pregunta {
     @Column(name = "id_pregunta")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer idPregunta;
+    @Lob
     String pregunta;
+
+    @Lob
     String respuesta;
 }
