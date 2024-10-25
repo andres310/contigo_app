@@ -20,4 +20,8 @@ public class Pregunta {
 
     @Lob
     String respuesta;
+
+    String region;
+
+    String ciudad;
 }

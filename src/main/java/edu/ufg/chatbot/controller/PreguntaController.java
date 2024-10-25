@@ -28,15 +28,15 @@ public class PreguntaController {
 	// 1 - Devuelve la respuesta guardada en base
 	@PostMapping("/respuesta")
 	public PromptDTO getRespuesta(@RequestBody PromptDTO prompt) {
-		return this.repository.findByPregunta(prompt.pregunta())
+		return this.repository.findByPreguntaAndRegionAndCiudad(prompt.pregunta(), prompt.region(), prompt.ciudad())
 				.map(this.mapper::map)
-				.orElseGet(() -> new PromptDTO("", "No se encontro la pregunta"));
+				.orElseGet(() -> new PromptDTO("", "No se encontro la pregunta", "", ""));
 	}
 
     // 2 - recibe prompt y devuelve true o falso dependiendo de si esta la respuesta en la base
 	@PostMapping("/existe")
 	public Boolean existeEnBase(@RequestBody PromptDTO prompt) {
-		return this.repository.existsByPregunta(prompt.pregunta());
+		return this.repository.existsByPreguntaAndRegionAndCiudad(prompt.pregunta(), prompt.region(), prompt.ciudad());
 	}
 	
 	// 3 - Guardar pregunta y respuesta
@@ -45,15 +45,16 @@ public class PreguntaController {
 
 		// Verificar respuesta vacia
 		if (dto.respuesta() == null || dto.respuesta().isBlank()) {
-			return new PromptDTO(dto.pregunta(), "respuesta vacía");
+			return new PromptDTO(dto.pregunta(), "respuesta vacía", "", "");
 		}
 
 		// Verificar si la pregunta ya existe
-		if (this.repository.existsByPregunta(dto.pregunta())) {
+		if (this.repository.existsByPreguntaAndRegionAndCiudad(dto.pregunta(), dto.region(), dto.ciudad())) {
 			// Si ya existe, devolver el DTO sin guardar
 			return dto;
 		}
-
+		//System.out.println("postPreguntaYRespuesta");
+		//System.out.println(dto);
 		// Si no existe, guardar la nueva pregunta y devolver el resultado
 		Pregunta entity = this.mapper.map(dto);
 		return this.mapper.map(this.repository.save(entity));
